@@ -16,6 +16,22 @@ jobs:
   test:
     name: Run backend tests
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: todo_user
+          POSTGRES_PASSWORD: todo_pass
+          POSTGRES_DB: todo_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,6 +46,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
+        env:
+          DATABASE_URL: postgresql://todo_user:todo_pass@localhost:5432/todo_db
         run: |
           cd backend
           pytest test_main.py -v
