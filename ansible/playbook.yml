@@ -1,0 +1,58 @@
+---
+- name: Deploy devops-todo application
+  hosts: webservers
+  become: true
+
+  vars:
+    app_dir: /opt/devops-todo
+    compose_file: docker-compose.yml
+
+  tasks:
+
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+        state: present
+        update_cache: true
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Install Docker Compose plugin
+      apt:
+        name: docker-compose-v2
+        state: present
+
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker-compose file
+      copy:
+        src: ../docker-compose.yml
+        dest: "{{ app_dir }}/{{ compose_file }}"
+        mode: '0644'
+
+    - name: Pull latest images
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        pull: always
+
+    - name: Start application
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
