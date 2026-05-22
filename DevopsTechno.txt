@@ -1,0 +1,8 @@
+Couche			Techno
+Frontend		React (Vite)
+Backend			Python FastAPI
+BDD			PostgreSQL
+Conteneurisation	Docker + docker-compose
+CI/CD			GitHub Actions
+IaC			Ansible
+Monitoring		Prometheus + Grafana
