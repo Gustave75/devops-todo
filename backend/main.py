@@ -22,6 +22,9 @@ app.add_middleware(
 # Expose les métriques Prometheus sur /metrics
 Instrumentator().instrument(app).expose(app)
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 @app.get("/tasks", response_model=list[schemas.TaskOut])
 def get_tasks(db: Session = Depends(get_db)):
